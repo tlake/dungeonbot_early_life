@@ -27,7 +27,7 @@ app = Flask(__name__)
 # API ROUTES
 ################################
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["POST"])
 def verify():
     eprint(dir(request))
 
