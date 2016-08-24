@@ -76,7 +76,7 @@ examples:
         event_user_id = self.event['user']
         event_user_name = bot.get_user_from_id(event_user_id)
 
-        final_result = "*{} rolls a {}* _({} = {})_".format(
+        final_result = "*{}* *rolls a {}* _({} = {})_".format(
                 event_user_name,
                 result,
                 roll_str,
