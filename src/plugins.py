@@ -34,7 +34,7 @@ examples:
         bot = handlers.SlackHandler()
         args = self.arg_string.replace(" ", "")
 
-        if len(args.split('&') > 1):
+        if len(args.split('&')) > 1:
             all_rolls = [' '.join(self._roll_func(this_roll).split(' ')[1:]) for this_roll in args.split('&')]
             final_result = ' and '.join(all_rolls)
 
