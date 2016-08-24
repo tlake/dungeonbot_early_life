@@ -6,7 +6,8 @@ A tiny Flask app to verify the URL for Slack's Events API.
 
 from flask import Flask, render_template, request, Response
 from oauth import token_negotiation
-from command import parse_command
+# from command import parse_command
+from handlers import EventHandler
 import os
 
 from auxiliaries.helpers import eprint
@@ -31,8 +32,8 @@ if app.debug:
 # TOOLS
 ################################
 
-def event_is_important(evt):
-    if (evt['user'] != os.getenv("BOT_ID")) and (evt['text'][0] == "!"):
+def event_is_important(event):
+    if (event['user'] != os.getenv("BOT_ID")) and (event['text'][0] == "!"):
         return True
     return False
 
@@ -52,7 +53,16 @@ def root():
 
     if event_is_important(event):
         event['text'] = event['text'][1:]  # strip out the '!' command prefix
-        parse_command(event)
+
+        eprint("event considered important:")
+        eprint(event)
+
+        handler = EventHandler(event)
+        handler.parse_command()
+
+    else:
+        eprint("event not considered important:")
+        eprint(event)
 
     return Response(status=200)
 
