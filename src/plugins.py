@@ -25,6 +25,7 @@ usage:
 examples:
     !roll 2d6
     !roll 1d20+4
+    !roll 1d6 & 1d4+2 & 2d8-1
 ```"""
 
         bot.make_post(self.event, help_text)
@@ -32,17 +33,29 @@ examples:
     def run(self):
         bot = handlers.SlackHandler()
         args = self.arg_string.replace(" ", "")
+
+        if len(args.split('&') > 1):
+            all_rolls = [' '.join(self._roll_func(this_roll).split(' ')[1:]) for this_roll in args.split('&')]
+            final_result = ' and '.join(all_rolls)
+
+        else:
+            final_result = self._roll_func(args)
+
+        bot.make_post(self.event, bot, final_result)
+
+
+    def _roll_func(self, bot, roll_str):
         roll = ""
         operator = "+"
         modifier = 0
 
-        if "+" in args:
-            roll, modifier = args.split("+")
-        elif "-" in args:
+        if "+" in roll_str:
+            roll, modifier = roll_str.split("+")
+        elif "-" in roll_str:
             operator = "-"
-            roll, modifier = args.split("-")
+            roll, modifier = roll_str.split("-")
         else:
-            roll = args
+            roll = roll_str
 
         number, sides = roll.split("d")
         modifier = int(modifier)
@@ -65,11 +78,11 @@ examples:
         final_result = "*{} rolls a {}* _({} = {})_".format(
                 event_user_name,
                 result,
-                args,
+                roll_str,
                 roll_plus_mods
             )
+        return final_result
 
-        bot.make_post(self.event, final_result)
 
 
 class HelpPlugin(Plugin):
