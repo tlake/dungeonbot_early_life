@@ -6,8 +6,10 @@ A tiny Flask app to verify the URL for Slack's Events API.
 
 from flask import Flask, render_template, request, Response
 from oauth import token_negotiation
-from slacker import Slacker
+from command import parse_command
 import os
+
+from auxiliaries.helpers import eprint
 
 
 ################################
@@ -29,7 +31,7 @@ if app.debug:
 # TOOLS
 ################################
 
-def we_care(evt):
+def event_is_important(evt):
     if (evt['user'] != os.getenv("BOT_ID")) and (evt['text'][0] == "!"):
         return True
     return False
@@ -41,27 +43,22 @@ def we_care(evt):
 
 @app.route("/", methods=["GET", "POST"])
 def root():
-    from helpers import eprint
     eprint("hit / route")
 
     if request.method == "GET":
         return render_template("index.html")
 
-    BOT = Slacker(os.getenv("BOT_ACCESS_TOKEN"))
+    event = request.json['event']
 
-    if we_care(request.json['event']):
-        BOT.chat.post_message(
-            request.json['event']['channel'],
-            request.json['event']['text'],
-            as_user=True,
-        )
+    if event_is_important(event):
+        event['text'] = event['text'][1:]  # strip out the '!' command prefix
+        parse_command(event)
 
     return Response(status=200)
 
 
 @app.route("/oauth", methods=["GET", "POST"])
 def oauth():
-    from helpers import eprint
     eprint("hit /oauth route")
 
     return token_negotiation()
