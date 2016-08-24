@@ -26,6 +26,16 @@ if app.debug:
 
 
 ################################
+# TOOLS
+################################
+
+def we_care(evt):
+    if (evt['user'] != os.getenv("BOT_ID")) and (evt['text'][0] == "!"):
+        return True
+    return False
+
+
+################################
 # API ROUTES
 ################################
 
@@ -37,18 +47,9 @@ def root():
     if request.method == "GET":
         return render_template("index.html")
 
-    eprint(Slacker(request.json['token']))
-    eprint(request.json)
-
-    # import ipdb
-    # ipdb.set_trace()
-
     BOT = Slacker(os.getenv("BOT_ACCESS_TOKEN"))
 
-    eprint(os.getenv("BOT_ID"))
-    eprint(request.json['event']['user'])
-
-    if app.debug and request.json['event']['user'] != os.getenv("BOT_ID"):
+    if we_care(request.json['event']):
         BOT.chat.post_message(
             request.json['event']['channel'],
             request.json['event']['text'],

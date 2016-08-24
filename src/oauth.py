@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import request, Response
-from helpers import eprint
+from auxiliaries.helpers import eprint
 
 
 def token_negotiation():
