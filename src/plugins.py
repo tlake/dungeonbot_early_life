@@ -21,6 +21,7 @@ description:
 
 usage:
     !roll [NUMBER OF DICE]d[DIE SIDES][+/-MODIFIER]
+    !roll [NUMBER OF DICE]d[DIE SIDES][+/-MODIFIER] & [NUMBER OF DICE]d[DIE SIDES][+/-MODIFIER] & ...
 
 examples:
     !roll 2d6
