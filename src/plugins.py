@@ -20,8 +20,8 @@ description:
     Rolls dice for you.
 
 usage:
-    !roll [NUMBER OF DICE]d[DIE SIDES][+/-MODIFIER]
-    !roll [NUMBER OF DICE]d[DIE SIDES][+/-MODIFIER] and [NUMBER OF DICE]d[DIE SIDES][+/-MODIFIER] and ...
+    !roll [HOW MANY]d[SIDES][+/-MODIFIER]
+    !roll [HOW MANY]d[SIDES][+/-MODIFIER] and [HOW MANY]d[SIDES][+/-MODIFIER] and ...
 
 examples:
     !roll 2d6
@@ -43,7 +43,6 @@ examples:
             final_result = self._roll_func(bot, args)
 
         bot.make_post(self.event, final_result)
-
 
     def _roll_func(self, bot, roll_str):
         roll = ""
@@ -78,7 +77,6 @@ examples:
         )
 
         mod_result = modifier if operator == "+" else modifier * -1
-        # result = roll_result + modifier if operator == "+" else roll_result - modifier
         result = roll_result + mod_result
 
         event_user_id = self.event['user']
@@ -93,7 +91,6 @@ examples:
                 max_roll + mod_result
             )
         return final_result
-
 
 
 class HelpPlugin(Plugin):
