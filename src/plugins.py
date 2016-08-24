@@ -77,7 +77,7 @@ examples:
                 str(modifier)
         )
 
-        mod_result = modifer if operator == "+" else modifer * -1
+        mod_result = modifier if operator == "+" else modifier * -1
         # result = roll_result + modifier if operator == "+" else roll_result - modifier
         result = roll_result + mod_result
 
