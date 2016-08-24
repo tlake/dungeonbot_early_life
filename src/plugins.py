@@ -77,7 +77,9 @@ examples:
                 str(modifier)
         )
 
-        result = roll_result + modifier if operator == "+" else roll_result - modifier
+        mod_result = modifer if operator == "+" else modifer * -1
+        # result = roll_result + modifier if operator == "+" else roll_result - modifier
+        result = roll_result + mod_result
 
         event_user_id = self.event['user']
         event_user_name = bot.get_user_from_id(event_user_id)
@@ -87,8 +89,8 @@ examples:
                 result,
                 roll_str,
                 roll_plus_mods,
-                min_roll + modifier,
-                max_roll + modifier
+                min_roll + mod_result,
+                max_roll + mod_result
             )
         return final_result
 
