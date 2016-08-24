@@ -37,7 +37,7 @@ examples:
 
         if len(args.split('and')) > 1:
             all_rolls = [' '.join(self._roll_func(bot, this_roll).split(' ')[1:]) for this_roll in args.split('and')]
-            final_result = '*' + bot.get_user_from_id(self.event['user']) + '* ' + ' and '.join(all_rolls)
+            final_result = '*' + bot.get_user_from_id(self.event['user']) + '* ' + '\n and '.join(all_rolls)
 
         else:
             final_result = self._roll_func(bot, args)
@@ -63,8 +63,14 @@ examples:
         number = int(number)
         sides = int(sides)
         roll_result = 0
+        min_roll = 0
+        max_roll = 0
+
         for x in range(0, number):
             roll_result += random.randint(1, sides)
+            min_roll += 1
+            max_roll += sides
+
         roll_plus_mods = "{} {} {}".format(
                 str(roll_result),
                 operator,
@@ -76,11 +82,13 @@ examples:
         event_user_id = self.event['user']
         event_user_name = bot.get_user_from_id(event_user_id)
 
-        final_result = "*{}* *rolls a {}* _({} = {})_".format(
+        final_result = "*{}* *rolls a {}* _({} = {})_ _(min: {}, max: {})_".format(
                 event_user_name,
                 result,
                 roll_str,
-                roll_plus_mods
+                roll_plus_mods,
+                min_roll,
+                max_roll
             )
         return final_result
 
