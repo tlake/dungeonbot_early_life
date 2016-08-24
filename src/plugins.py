@@ -37,7 +37,7 @@ examples:
 
         if len(args.split('and')) > 1:
             all_rolls = [' '.join(self._roll_func(bot, this_roll).split(' ')[1:]) for this_roll in args.split('and')]
-            final_result = bot.get_user_from_id(self.event['user']) + ' ' + ' and '.join(all_rolls)
+            final_result = '*' + bot.get_user_from_id(self.event['user']) + '* ' + ' and '.join(all_rolls)
 
         else:
             final_result = self._roll_func(bot, args)
