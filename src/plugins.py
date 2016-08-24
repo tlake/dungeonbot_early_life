@@ -21,12 +21,12 @@ description:
 
 usage:
     !roll [NUMBER OF DICE]d[DIE SIDES][+/-MODIFIER]
-    !roll [NUMBER OF DICE]d[DIE SIDES][+/-MODIFIER] & [NUMBER OF DICE]d[DIE SIDES][+/-MODIFIER] & ...
+    !roll [NUMBER OF DICE]d[DIE SIDES][+/-MODIFIER] and [NUMBER OF DICE]d[DIE SIDES][+/-MODIFIER] and ...
 
 examples:
     !roll 2d6
     !roll 1d20+4
-    !roll 1d6 & 1d4+2 & 2d8-1
+    !roll 1d6 and 1d4+2 and 2d8-1
 ```"""
 
         bot.make_post(self.event, help_text)
@@ -36,7 +36,7 @@ examples:
         args = self.arg_string.replace(" ", "")
 
         if len(args.split('&')) > 1:
-            all_rolls = [' '.join(self._roll_func(bot, this_roll).split(' ')[1:]) for this_roll in args.split('&')]
+            all_rolls = [' '.join(self._roll_func(bot, this_roll).split(' ')[1:]) for this_roll in args.split('and')]
             final_result = ' and '.join(all_rolls)
 
         else:
