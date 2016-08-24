@@ -37,10 +37,10 @@ examples:
 
         if len(args.split('&')) > 1:
             all_rolls = [' '.join(self._roll_func(this_roll).split(' ')[1:]) for this_roll in args.split('&')]
-            final_result = ' and '.join(all_rolls)
+            final_result = ' and '.join(bot, all_rolls)
 
         else:
-            final_result = self._roll_func(args)
+            final_result = self._roll_func(bot, args)
 
         bot.make_post(self.event, bot, final_result)
 
