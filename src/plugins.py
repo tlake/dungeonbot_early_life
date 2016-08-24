@@ -42,7 +42,7 @@ examples:
         else:
             final_result = self._roll_func(bot, args)
 
-        bot.make_post(self.event, bot, final_result)
+        bot.make_post(self.event, final_result)
 
 
     def _roll_func(self, bot, roll_str):
