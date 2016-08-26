@@ -1,18 +1,19 @@
-import handlers
-
-import random
-
 
 class Plugin(object):
+    help_text = "No help exists for this plugin."
+
     def __init__(self, event, arg_string):
         self.event = event
         self.arg_string = arg_string
 
+    def help(self):
+        import handlers
+        bot = handlers.SlackHandler()
+        bot.make_post(self.event, self.help_text)
+
 
 class RollPlugin(Plugin):
-    def help(self):
-        bot = handlers.SlackHandler()
-        help_text = """```
+    help_text = """```
 command:
     !roll
 
@@ -29,10 +30,11 @@ examples:
     !roll 1d6 and 1d4+2 and 2d8-1
 ```"""
 
-        bot.make_post(self.event, help_text)
-
     def run(self):
+        import handlers
+
         bot = handlers.SlackHandler()
+
         args = self.arg_string.replace(" ", "")
 
         if len(args.split('and')) > 1:
@@ -45,6 +47,8 @@ examples:
         bot.make_post(self.event, final_result)
 
     def _roll_func(self, bot, roll_str):
+        import random
+
         roll = ""
         operator = "+"
         modifier = 0
@@ -99,11 +103,11 @@ class HelpPlugin(Plugin):
     }
 
     help_text = """```
-available commands:
+available help topics:
     help
     roll
 
-Try `!help [command]` for information on a specific command.
+Try `!help [topic]` for information on a specific topic.
 ```"""
 
     def run(self):
@@ -114,6 +118,4 @@ Try `!help [command]` for information on a specific command.
             plugin.help()
 
         else:
-            bot = handlers.SlackHandler()
-            message = self.help_text
-            bot.make_post(self.event, message)
+            self.help()
