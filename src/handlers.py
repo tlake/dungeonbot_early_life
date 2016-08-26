@@ -1,25 +1,38 @@
-from slacker import Slacker
-import plugins
-import os
-
 
 class SlackHandler(object):
     def __init__(self):
-        self.slack = Slacker(os.getenv("BOT_ACCESS_TOKEN"))
+        from slacker import Slacker
+        import os
+
+        self.slack = Slacker(os.environ.get("BOT_ACCESS_TOKEN"))
 
     def make_post(self, event, message):
-        self.slack.chat.post_message(
-            event['channel'],
-            message,
-            as_user=True,
-        )
+        import os
+
+        if os.getenv("PERMISSION_TO_SPEAK"):
+            self.slack.chat.post_message(
+                event['channel'],
+                message,
+                as_user=True,
+            )
+
+        else:
+            from auxiliaries.helpers import eprint
+            eprint("Message that would have been sent to Slack:")
+            eprint(message)
 
     def get_user_from_id(self, user_id):
-        member_entry = [x for x in self.slack.users.list().body['members'] if user_id in x["id"]][0]
-        return member_entry["name"]
+        import os
+
+        if os.getenv("PERMISSION_TO_SPEAK"):
+            member_entry = [x for x in self.slack.users.list().body['members'] if user_id in x["id"]][0]
+            return member_entry["name"]
+        else:
+            return "placeholder_username"
 
 
 class EventHandler(object):
+    import plugins
 
     valid_commands = {
         'help': plugins.HelpPlugin,

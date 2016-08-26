@@ -1,18 +1,19 @@
-import handlers
-
-import random
-
 
 class Plugin(object):
+    help_text = "No help exists for this plugin."
+
     def __init__(self, event, arg_string):
         self.event = event
         self.arg_string = arg_string
 
+    def help(self):
+        import handlers
+        bot = handlers.SlackHandler()
+        bot.make_post(self.event, self.help_text)
+
 
 class RollPlugin(Plugin):
-    def help(self):
-        bot = handlers.SlackHandler()
-        help_text = """```
+    help_text = """```
 command:
     !roll
 
@@ -21,30 +22,33 @@ description:
 
 usage:
     !roll [HOW MANY]d[SIDES][+/-MODIFIER]
-    !roll [HOW MANY]d[SIDES][+/-MODIFIER] and [HOW MANY]d[SIDES][+/-MODIFIER] and ...
+    !roll [HOW MANY]d[SIDES][+/-MODIFIER], [HOW MANY]d[SIDES][+/-MODIFIER], ...
 
 examples:
     !roll 2d6
     !roll 1d20+4
-    !roll 1d6 and 1d4+2 and 2d8-1
+    !roll 1d6, 1d4+2, 2d8-1
 ```"""
 
-        bot.make_post(self.event, help_text)
-
     def run(self):
+        import handlers
         bot = handlers.SlackHandler()
-        args = self.arg_string.replace(" ", "")
 
-        if len(args.split('and')) > 1:
-            all_rolls = [' '.join(self._roll_func(bot, this_roll).split(' ')[1:]) for this_roll in args.split('and')]
-            final_result = '*' + bot.get_user_from_id(self.event['user']) + '* ' + '\n\t and '.join(all_rolls)
+        args = self.arg_string.replace(" ", "").split(',')
 
-        else:
-            final_result = self._roll_func(bot, args)
+        message = "_*Roll result{} for {}:*_".format(
+            "s" if len(args) > 1 else "",
+            bot.get_user_from_id(self.event['user'])
+        )
 
-        bot.make_post(self.event, final_result)
+        for item in args:
+            message += "\n" + self.process_roll(item)
 
-    def _roll_func(self, bot, roll_str):
+        bot.make_post(self.event, message)
+
+    def process_roll(self, roll_str):
+        import random
+
         roll = ""
         operator = "+"
         modifier = 0
@@ -79,11 +83,7 @@ examples:
         mod_result = modifier if operator == "+" else modifier * -1
         result = roll_result + mod_result
 
-        event_user_id = self.event['user']
-        event_user_name = bot.get_user_from_id(event_user_id)
-
-        final_result = "*{}* *rolls a {}* _({} = {})_ _(min: {}, max: {})_".format(
-                event_user_name,
+        final_result = "*[ {} ]* _({} = {}) (min {}, max {})_".format(
                 result,
                 roll_str,
                 roll_plus_mods,
@@ -99,11 +99,11 @@ class HelpPlugin(Plugin):
     }
 
     help_text = """```
-available commands:
+available help topics:
     help
     roll
 
-Try `!help [command]` for information on a specific command.
+Try `!help [topic]` for information on a specific topic.
 ```"""
 
     def run(self):
@@ -114,6 +114,4 @@ Try `!help [command]` for information on a specific command.
             plugin.help()
 
         else:
-            bot = handlers.SlackHandler()
-            message = self.help_text
-            bot.make_post(self.event, message)
+            self.help()
