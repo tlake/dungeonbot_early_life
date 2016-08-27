@@ -27,6 +27,11 @@ Karma
  - `!karma STRING` prints total/positive/negative karma for STRING
 
 More Robust `!roll`
+ - Account for advantage/disadvantage
+      - `!roll -a 1d20, -d 1d20+5`
+      - for each `-a` or `-d` specified, DungeonBot would make that roll twice
+        behind the scenes, and then return the highest or lowest, depending on
+        if advantage or if disadvantage
  - `!roll save KEY VALUE`
  - `!roll KEY`
  - `!roll delete KEY`
