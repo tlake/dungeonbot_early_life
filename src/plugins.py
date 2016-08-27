@@ -49,11 +49,31 @@ examples:
     def process_roll(self, roll_str):
         import random
 
-        valid_flags = {"a": "advantage", "d": "disadvantage"}
+        def roll_die(number, sides):
+            result = 0
+            for x in range(0, number):
+                result += random.randint(1, sides)
+            return result
+
+        def advantage(number, sides):
+            die_roll = max(roll_die(number, sides), roll_die(number, sides))
+            message = "with advantage"
+            return (die_roll, message)
+
+        def disadvantage(number, sides):
+            die_roll = min(roll_die(number, sides), roll_die(number, sides))
+            message = "with disadvantage"
+            return (die_roll, message)
+
+        valid_flags = {"a": advantage, "d": disadvantage}
         roll = ""
         operator = "+"
         modifier = 0
         flag = None
+        message = ""
+
+        if roll_str[0] == "-":
+            roll_str = roll_str[1:]
 
         if roll_str[0] in valid_flags:
             flag = roll_str[0]
@@ -71,31 +91,13 @@ examples:
         modifier = int(modifier)
         number = int(number)
         sides = int(sides)
-        roll_result = 0
-        # min_roll = 0
-        # max_roll = 0
         min_roll = number
         max_roll = sides * number
 
-        def roll(number, sides):
-            result = 0
-            for x in range(0, number):
-                result += random.randint(1, sides)
-            return result
-
-        def advantage(number, sides):
-            return max(roll(number, sides), roll(number, sides))
-
-        def disadvantage(number, sides):
-            return min(roll(number, sides), roll(number, sides))
-
-        if flag == "a":
-            roll_result = advantage(number, sides)
-        elif flag == "d":
-            roll_result = disadvantage(number, sides)
+        if flag:
+            roll_result, message = valid_flags[flag](number, sides)
         else:
-            roll_result = roll(number, sides)
-
+            roll_result = roll_die(number, sides)
 
         roll_plus_mods = "{} {} {}".format(
                 str(roll_result),
@@ -106,12 +108,13 @@ examples:
         mod_result = modifier if operator == "+" else modifier * -1
         result = roll_result + mod_result
 
-        final_result = "*[ {} ]* _({} = {}) (min {}, max {})_".format(
+        final_result = "*[ {} ]* _({} = {}) (min {}, max {})_ {}".format(
                 result,
                 roll_str,
                 roll_plus_mods,
                 min_roll + mod_result,
-                max_roll + mod_result
+                max_roll + mod_result,
+                message
             )
         return final_result
 
