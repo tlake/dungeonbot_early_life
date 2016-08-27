@@ -49,9 +49,15 @@ examples:
     def process_roll(self, roll_str):
         import random
 
+        valid_flags = {"a": "advantage", "d": "disadvantage"}
         roll = ""
         operator = "+"
         modifier = 0
+        flag = None
+
+        if roll_str[0] in valid_flags:
+            flag = roll_str[0]
+            roll_str = roll_str[1:]
 
         if "+" in roll_str:
             roll, modifier = roll_str.split("+")
@@ -66,13 +72,30 @@ examples:
         number = int(number)
         sides = int(sides)
         roll_result = 0
-        min_roll = 0
-        max_roll = 0
+        # min_roll = 0
+        # max_roll = 0
+        min_roll = number
+        max_roll = sides * number
 
-        for x in range(0, number):
-            roll_result += random.randint(1, sides)
-            min_roll += 1
-            max_roll += sides
+        def roll(number, sides):
+            result = 0
+            for x in range(0, number):
+                result += random.randint(1, sides)
+            return result
+
+        def advantage(number, sides):
+            return max(roll(number, sides), roll(number, sides))
+
+        def disadvantage(number, sides):
+            return min(roll(number, sides), roll(number, sides))
+
+        if flag == "a":
+            roll_result = advantage(number, sides)
+        elif flag == "d":
+            roll_result = disadvantage(number, sides)
+        else:
+            roll_result = roll(number, sides)
+
 
         roll_plus_mods = "{} {} {}".format(
                 str(roll_result),
