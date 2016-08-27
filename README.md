@@ -11,45 +11,15 @@ for posts in channels and then acts upon them if appropriate using the
 primarily done through `!` commands, although there are (plans for) exceptions.
 
 
-### `!` Commands
-
-!help
- - Displays the help text, or help on a specific command if one is supplied.
-
-!roll
- - Rolls dice.
-
-
-### Future Plans & Features
-
-Karma
- - `STRING++` or `STRING--` adds one positive or negative karma to STRING
- - `!karma STRING` prints total/positive/negative karma for STRING
-
-More Robust `!roll`
- - Account for advantage/disadvantage
-      - `!roll -a 1d20, -d 1d20+5`
-      - for each `-a` or `-d` specified, DungeonBot would make that roll twice
-        behind the scenes, and then return the highest or lowest, depending on
-        if advantage or if disadvantage
- - `!roll save KEY VALUE`
- - `!roll KEY`
- - `!roll delete KEY`
-
-Campaign Highlights
- - `!log add STRING` saves a timestamped STRING
- - `!log list [INT]` prints out the most recent (or INT most recent) highlight(s)
-
-Miscellaneous Player K/V Storage
- - `!attr set KEY VALUE` creates/updates KEY with VALUE
- - `!attr get KEY`
- - `!attr list`
- - `!attr delete KEY`
-
-
 ## Contributing
 
-Want to help out? Feel free to submit MR's to the `dev` branch!
+Want to help out? We track stuff that needs doing over in
+[issues](https://github.com/tlake/dungeonbot/issues). Feel free to submit pull
+requests to the `dev` branch, and be sure to reference the issue number that
+you're working on.
+
+Please be sure to update any relevant help text and resolve any potential merge
+conflicts, and try to be PEP8 compliant.
 
 
 #### Setup
