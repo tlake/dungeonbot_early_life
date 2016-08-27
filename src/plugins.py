@@ -20,14 +20,27 @@ command:
 description:
     Rolls dice for you.
 
+    <PARAMS> are required
+    [PARAMS] are optional
+
+    This command is whitespace-agnostic.
+    ("1d2+2" will be processed exactly the same as "1 d 2    +2")
+
+    You can specify multiple die rolls in the same command as long as they
+    are separated by commas.
+
+    You can specify a roll to be made with advantage by prepending the roll
+    with the `-a` flag (or just `a`), or with disadvantage by prepending the
+    roll with `-d` (or just `d`).
+
+
 usage:
-    !roll [HOW MANY]d[SIDES][+/-MODIFIER]
-    !roll [HOW MANY]d[SIDES][+/-MODIFIER], [HOW MANY]d[SIDES][+/-MODIFIER], ...
+    !roll [ADVANTAGE/DISADVANTAGE] <HOW MANY> d <SIDES> [+/-MODIFIER] [, ... ]
 
 examples:
     !roll 2d6
-    !roll 1d20+4
-    !roll 1d6, 1d4+2, 2d8-1
+    !roll -d 1d20-2
+    !roll a 1d20+4, 4d6, -d 1d20+3
 ```"""
 
     def run(self):
