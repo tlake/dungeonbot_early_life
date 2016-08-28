@@ -13,13 +13,32 @@ primarily done through `!` commands, although there are (plans for) exceptions.
 
 ## Contributing
 
-Want to help out? We track stuff that needs doing over in
-[issues](https://github.com/tlake/dungeonbot/issues). Feel free to submit pull
-requests to the `dev` branch, and be sure to reference the issue number that
-you're working on.
+We track stuff that needs doing over in
+[issues](https://github.com/tlake/dungeonbot/issues).
 
-Please be sure to update any relevant help text and resolve any potential merge
-conflicts, and try to be PEP8 compliant.
+Want to help out? Great! Here's how:
+
+- Check out a new branch for your work from `dev` branch.
+- Do your thing.
+- When your changes are ready to be merged back into `dev` branch, do a
+  `git pull --rebase` from `dev` to make sure your branch is up to date with
+  the most recent `dev` and to replay your changes over the updated `dev` work.
+- Resolve any merge conflicts, of course.
+- Squash your commits into a single commit (I find `git rebase -i HEAD~x` to be
+  particularly helpful, where `x` is something close to the number of commits
+  that you've made).
+- Give your new single commit a good descriptive title, and write more stuff
+  in the body if you'd like.
+- Force-push that new squashed commit to your personal branch (I don't care
+  about rewriting history in these small auxiliary branches - I'd rather have
+  a cleaner, easier-to-follow history in `master`).
+- Make a merge request from your new branch back into `dev`.
+     - If your work addresses an issue, please reference it in the body of
+       the MR.
+     - If your work resolves an issue, please use Git's issue-resolution
+       keywords in the body of the MR (examples: `closes #1`, `fixes #1`, etc.)
+
+Please be sure to update any relevant help text, and try to be PEP8 compliant.
 
 
 #### Setup
