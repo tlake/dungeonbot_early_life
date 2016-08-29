@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
-"""
-A tiny Flask app to verify the URL for Slack's Events API.
-"""
+from flask import (
+    Flask,
+    render_template,
+    request,
+    Response
+)
 
-from flask import Flask, render_template, request, Response
-from oauth import token_negotiation
-# from command import parse_command
-from handlers import EventHandler
+from dungeonbot.oauth import token_negotiation
+from dungeonbot.handlers import EventHandler
+
 import os
 
 from auxiliaries.helpers import eprint
@@ -15,16 +17,26 @@ from auxiliaries.helpers import eprint
 
 ################################
 # APP SETTINGS
-################################
+#################################
+
+DB_USER = os.getenv("DB_USER")
+DB_PASS = os.getenv("DB_PASS")
+DB_CRED = DB_USER + ":" + DB_PASS
+DB_NAME = "dungeonbot_db"
+DB_URL = "postgresql://" + DB_CRED + "@localhost/" + DB_NAME
 
 app = Flask(__name__)
+app.config.update(
+    DEBUG=os.getenv("DEBUG", False),
+    SECRET_KEY=os.getenv("SECRET_KEY", "sooper seekrit"),
+    SQLALCHEMY_DATABASE_URI=DB_URL,
+    SQLALCHEMY_TRACK_MODIFICATIONS=False,
+)
 
 
-if app.debug:
-    import logging
-    stream_handler = logging.StreamHandler()
-    stream_handler.setLevel(logging.INFO)
-    app.logger.addHandler(stream_handler)
+# @app.teardown_appcontext
+# def shutdown_session(exception=None):
+#     DBSession.remove()
 
 
 ################################
@@ -71,8 +83,3 @@ def oauth():
     eprint("hit /oauth route")
 
     return token_negotiation()
-
-
-if __name__ == "__main__":
-    app.debug = True
-    app.run(host="0.0.0.0", port=5006)

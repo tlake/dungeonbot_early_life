@@ -7,7 +7,7 @@ class Plugin(object):
         self.arg_string = arg_string
 
     def help(self):
-        import handlers
+        from dungeonbot import handlers
         bot = handlers.SlackHandler()
         bot.make_post(self.event, self.help_text)
 
@@ -44,7 +44,7 @@ examples:
 ```"""
 
     def run(self):
-        import handlers
+        from dungeonbot import handlers
         bot = handlers.SlackHandler()
 
         args = self.arg_string.replace(" ", "").split(',')

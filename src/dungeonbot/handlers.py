@@ -18,8 +18,8 @@ class SlackHandler(object):
 
         else:
             from auxiliaries.helpers import eprint
-            eprint("Message that would have been sent to Slack:")
-            eprint(message)
+            message = '\n\n' + message + '\n'
+            eprint("Message that would have been sent to Slack:", message)
 
     def get_user_from_id(self, user_id):
         import os
@@ -28,11 +28,11 @@ class SlackHandler(object):
             member_entry = [x for x in self.slack.users.list().body['members'] if user_id in x["id"]][0]
             return member_entry["name"]
         else:
-            return "placeholder_username"
+            return "USERNAME"
 
 
 class EventHandler(object):
-    import plugins
+    from dungeonbot import plugins
 
     valid_commands = {
         'help': plugins.HelpPlugin,
