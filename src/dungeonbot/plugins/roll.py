@@ -1,27 +1,16 @@
+from dungeonbot.plugins.primordials import BangCommandPlugin
+from dungeonbot import handlers
 
-class Plugin(object):
-    help_text = "No help exists for this plugin."
-
-    def __init__(self, event, arg_string):
-        self.event = event
-        self.arg_string = arg_string
-
-    def help(self):
-        from dungeonbot import handlers
-        bot = handlers.SlackHandler()
-        bot.make_post(self.event, self.help_text)
+import random
 
 
-class RollPlugin(Plugin):
+class RollPlugin(BangCommandPlugin):
     help_text = """```
 command:
     !roll
 
 description:
     Rolls dice for you.
-
-    <PARAMS> are required
-    [PARAMS] are optional
 
     This command is whitespace-agnostic.
     ("1d2+2" will be processed exactly the same as "1 d 2    +2")
@@ -32,6 +21,9 @@ description:
     You can specify a roll to be made with advantage by prepending the roll
     with the `-a` flag (or just `a`), or with disadvantage by prepending the
     roll with `-d` (or just `d`).
+
+    <PARAMS> are required
+    [PARAMS] are optional
 
 
 usage:
@@ -44,7 +36,7 @@ examples:
 ```"""
 
     def run(self):
-        from dungeonbot import handlers
+        # from dungeonbot import handlers
         bot = handlers.SlackHandler()
 
         args = self.arg_string.replace(" ", "").split(',')
@@ -60,7 +52,7 @@ examples:
         bot.make_post(self.event, message)
 
     def process_roll(self, roll_str):
-        import random
+        # import random
 
         def roll_die(number, sides):
             result = 0
@@ -131,27 +123,3 @@ examples:
             )
 
         return final_result
-
-
-class HelpPlugin(Plugin):
-    help_topics = {
-        'roll': RollPlugin,
-    }
-
-    help_text = """```
-available help topics:
-    help
-    roll
-
-Try `!help [topic]` for information on a specific topic.
-```"""
-
-    def run(self):
-        args = self.arg_string.split()
-
-        if args and args[0] in self.help_topics:
-            plugin = self.help_topics[args[0]](self.event, self.arg_string)
-            plugin.help()
-
-        else:
-            self.help()

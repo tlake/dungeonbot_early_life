@@ -44,7 +44,12 @@ app.config.update(
 ################################
 
 def event_is_important(event):
-    if (event['user'] != os.getenv("BOT_ID")) and (event['text'][0] == "!"):
+    suffixes = ["++", "--"]
+    if (event['user'] != os.getenv("BOT_ID")) and \
+       (
+            event['text'][0] == "!" or
+            event['text'][-2:] in suffixes
+       ):
         return True
     return False
 
@@ -61,15 +66,14 @@ def root():
         return render_template("index.html")
 
     event = request.json['event']
+    event['team_id'] = request.json['team_id']
 
     if event_is_important(event):
-        event['text'] = event['text'][1:]  # strip out the '!' command prefix
-
         eprint("event considered important:")
         eprint(event)
 
         handler = EventHandler(event)
-        handler.parse_command()
+        handler.process_event()
 
     else:
         eprint("event not considered important:")
