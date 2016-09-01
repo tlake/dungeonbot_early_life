@@ -1,11 +1,11 @@
-from dungeonbot import handlers
+from dungeonbot.handlers.slack import SlackHandler
 
 
 class BasePlugin(object):
     help_text = "Somebody didn't give their plugin any help text. For shame."
 
     def help(self):
-        bot = handlers.SlackHandler()
+        bot = SlackHandler()
         bot.make_post(self.event, self.help_text)
 
 

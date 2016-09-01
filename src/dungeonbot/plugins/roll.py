@@ -1,5 +1,5 @@
 from dungeonbot.plugins.primordials import BangCommandPlugin
-from dungeonbot import handlers
+from dungeonbot.handlers.slack import SlackHandler
 
 import random
 
@@ -36,8 +36,7 @@ examples:
 ```"""
 
     def run(self):
-        # from dungeonbot import handlers
-        bot = handlers.SlackHandler()
+        bot = SlackHandler()
 
         args = self.arg_string.replace(" ", "").split(',')
 

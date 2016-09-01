@@ -1,17 +1,20 @@
 from dungeonbot.plugins.primordials import BangCommandPlugin
-from dungeonbot.plugins import (
-    karma,
-    roll,
+from dungeonbot.plugins.karma import (
+    KarmaPlugin,
+    KarmaNewestPlugin,
+    KarmaTopPlugin,
+    KarmaBottomPlugin,
 )
+from dungeonbot.plugins.roll import RollPlugin
 
 
 class HelpPlugin(BangCommandPlugin):
     help_topics = {
-        'karma': karma.KarmaPlugin,
-        'karma_newest': karma.KarmaNewestPlugin,
-        'karma_top': karma.KarmaTopPlugin,
-        'karma_bottom': karma.KarmaBottomPlugin,
-        'roll': roll.RollPlugin,
+        'karma': KarmaPlugin,
+        'karma_newest': KarmaNewestPlugin,
+        'karma_top': KarmaTopPlugin,
+        'karma_bottom': KarmaBottomPlugin,
+        'roll': RollPlugin,
     }
 
     help_text = """```

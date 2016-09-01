@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from dungeonbot import app
 from datetime import datetime
+from sqlalchemy.orm.exc import NoResultFound
 
 
 db = SQLAlchemy(app)
@@ -44,7 +45,11 @@ class KarmaModel(db.Model):
     def get_by_name(cls, string_id=None, session=None):
         if session is None:
             session = db.session
-        return session.query(cls).filter_by(string_id=string_id).one()
+        try:
+            instance = session.query(cls).filter_by(string_id=string_id).one()
+        except NoResultFound:
+            instance = None
+        return instance
 
     @classmethod
     def get_by_id(cls, model_id=None, session=None):

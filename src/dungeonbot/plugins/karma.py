@@ -2,15 +2,13 @@ from dungeonbot.plugins.primordials import (
     BangCommandPlugin,
     SuffixCommandPlugin,
 )
-# from dungeonbot.handlers import SlackHandler
+from dungeonbot.handlers.slack import SlackHandler
 from dungeonbot.models import KarmaModel
 
 
 class KarmaAssistant(object):
     def check_if_correlates_to_userid(self, event, possible_username):
         """Returns a Slack user ID or None"""
-
-        from dungeonbot.handlers import SlackHandler
 
         bot = SlackHandler()
         user_id = bot.get_userid_from_name(possible_username)
@@ -25,8 +23,6 @@ class KarmaAssistant(object):
 
     def check_if_correlates_to_username(self, event, possible_userid):
         """Returns a Slack username or None"""
-
-        from dungeonbot.handlers import SlackHandler
 
         bot = SlackHandler()
         username = bot.get_user_from_id(possible_userid)
@@ -61,11 +57,18 @@ class KarmaModifyPlugin(SuffixCommandPlugin):
         upvotes = 1 if self.suffix == '++' else 0
         downvotes = 1 if self.suffix == '--' else 0
 
-        KarmaModel.modify(
-            string_id=karma_subject,
-            upvotes=upvotes,
-            downvotes=downvotes,
-        )
+        if KarmaModel.get_by_name(karma_subject):
+            KarmaModel.modify(
+                string_id=karma_subject,
+                upvotes=upvotes,
+                downvotes=downvotes,
+            )
+        else:
+            KarmaModel.new(
+                string_id=karma_subject,
+                upvotes=upvotes,
+                downvotes=downvotes,
+            )
 
 
 class KarmaPlugin(BangCommandPlugin):
@@ -118,7 +121,6 @@ class KarmaPlugin(BangCommandPlugin):
         Otherwise, use the record's string_id.
         """
 
-        from dungeonbot.handlers import SlackHandler
         bot = SlackHandler()
         KA = KarmaAssistant()
 
@@ -130,23 +132,29 @@ class KarmaPlugin(BangCommandPlugin):
         karma_subject = possible_userid if possible_userid else self.arg_string
 
         karma_entry = KarmaModel.get_by_name(karma_subject)
-        entry_name = karma_entry['string_id']
 
-        possible_username = KA.check_if_correlates_to_username(
-            self.event,
-            entry_name,
-        )
+        if karma_entry:
+            entry_name = karma_entry.string_id
 
-        subject_name = possible_username if possible_username else entry_name
+            possible_username = KA.check_if_correlates_to_username(
+                self.event,
+                entry_name,
+            )
 
-        message = "*{}* has *{}* karma _({} ++, {} --)_".format(
-            subject_name,
-            karma_entry.karma,
-            karma_entry.upvotes,
-            karma_entry.downvotes,
-        )
+            subject_name = possible_username if possible_username else entry_name
 
-        bot.make_post(self.event, message)
+            message = "*{}* has *{}* karma _({} ++, {} --)_".format(
+                subject_name,
+                karma_entry.karma,
+                karma_entry.upvotes,
+                karma_entry.downvotes,
+            )
+
+            bot.make_post(self.event, message)
+
+        else:
+            message = "No entry found for *{}*.".format(self.arg_string)
+            bot.make_post(self.event, message)
 
 
 class KarmaNewestPlugin(BangCommandPlugin):
@@ -168,6 +176,49 @@ examples:
     !karma_newest 10
 ```"""
 
+    def run(self):
+        bot = SlackHandler()
+        KA = KarmaAssistant()
+        how_many = 5
+
+        if self.arg_string:
+            try:
+                how_many = int(self.arg_string)
+            except ValueError:
+                bot.make_post(self.event, "{} is not a valid number.".format(
+                    self.arg_string
+                ))
+                return
+            if how_many <= 0:
+                bot.make_post(self.event, "{} is not a valid number.".format(
+                    how_many
+                ))
+                return
+
+        karma_objects = KarmaModel.list_newest(how_many=how_many)
+
+        for item in karma_objects:
+            possible_username = KA.check_if_correlates_to_username(
+                self.event,
+                item.string_id,
+            )
+            if possible_username:
+                item.string_id = possible_username
+
+        message = "*The {} most-recently created karma subjects:*\n\n".format(
+            how_many,
+        )
+
+        for item in karma_objects:
+            message += "*{}* with *{}* karma _({} ++, {} --)_\n".format(
+                item.string_id,
+                item.karma,
+                item.upvotes,
+                item.downvotes,
+            )
+
+        bot.make_post(self.event, message)
+
 
 class KarmaTopPlugin(BangCommandPlugin):
     help_text = """```
@@ -188,6 +239,49 @@ examples:
     !karma_top 10
 ```"""
 
+    def run(self):
+        bot = SlackHandler()
+        KA = KarmaAssistant()
+        how_many = 5
+
+        if self.arg_string:
+            try:
+                how_many = int(self.arg_string)
+            except ValueError:
+                bot.make_post(self.event, "{} is not a valid number.".format(
+                    self.arg_string
+                ))
+                return
+            if how_many <= 0:
+                bot.make_post(self.event, "{} is not a valid number.".format(
+                    how_many
+                ))
+                return
+
+        karma_objects = KarmaModel.list_highest(how_many=how_many)
+
+        for item in karma_objects:
+            possible_username = KA.check_if_correlates_to_username(
+                self.event,
+                item.string_id,
+            )
+            if possible_username:
+                item.string_id = possible_username
+
+        message = "*The {} highest-rated karma subjects:*\n\n".format(
+            how_many,
+        )
+
+        for item in karma_objects:
+            message += "*{}* with *{}* karma _({} ++, {} --)_\n".format(
+                item.string_id,
+                item.karma,
+                item.upvotes,
+                item.downvotes,
+            )
+
+        bot.make_post(self.event, message)
+
 
 class KarmaBottomPlugin(BangCommandPlugin):
     help_text = """```
@@ -207,3 +301,46 @@ examples:
     !karma_bottom
     !karma_bottom 10
 ```"""
+
+    def run(self):
+        bot = SlackHandler()
+        KA = KarmaAssistant()
+        how_many = 5
+
+        if self.arg_string:
+            try:
+                how_many = int(self.arg_string)
+            except ValueError:
+                bot.make_post(self.event, "{} is not a valid number.".format(
+                    self.arg_string
+                ))
+                return
+            if how_many <= 0:
+                bot.make_post(self.event, "{} is not a valid number.".format(
+                    how_many
+                ))
+                return
+
+        karma_objects = KarmaModel.list_lowest(how_many=how_many)
+
+        for item in karma_objects:
+            possible_username = KA.check_if_correlates_to_username(
+                self.event,
+                item.string_id,
+            )
+            if possible_username:
+                item.string_id = possible_username
+
+        message = "*The {} lowest-rated karma subjects:*\n\n".format(
+            how_many,
+        )
+
+        for item in karma_objects:
+            message += "*{}* with *{}* karma _({} ++, {} --)_\n".format(
+                item.string_id,
+                item.karma,
+                item.upvotes,
+                item.downvotes,
+            )
+
+        bot.make_post(self.event, message)
