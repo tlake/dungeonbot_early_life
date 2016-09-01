@@ -8,12 +8,16 @@ from dungeonbot.plugins import (
 class HelpPlugin(BangCommandPlugin):
     help_topics = {
         'karma': karma.KarmaPlugin,
+        'karma_newest': karma.KarmaNewestPlugin,
+        'karma_top': karma.KarmaTopPlugin,
+        'karma_bottom': karma.KarmaBottomPlugin,
         'roll': roll.RollPlugin,
     }
 
     help_text = """```
 available help topics:
     help
+    karma
     roll
 
 Try `!help [topic]` for information on a specific topic.

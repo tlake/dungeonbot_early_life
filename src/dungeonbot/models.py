@@ -53,19 +53,19 @@ class KarmaModel(db.Model):
         return session.query(cls).get(model_id)
 
     @classmethod
-    def list_newest(cls, how_many=10, session=None):
+    def list_newest(cls, how_many=5, session=None):
         if session is None:
             session = db.session
         return session.query(cls).order_by('created desc').limit(how_many).all()
 
     @classmethod
-    def list_highest(cls, how_many=10, session=None):
+    def list_highest(cls, how_many=5, session=None):
         if session is None:
             session = db.session
         return session.query(cls).order_by('karma desc').limit(how_many).all()
 
     @classmethod
-    def list_lowest(cls, how_many=10, session=None):
+    def list_lowest(cls, how_many=5, session=None):
         if session is None:
             session = db.session
         return session.query(cls).order_by('karma').limit(how_many).all()

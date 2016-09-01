@@ -6,13 +6,7 @@ from flask import (
     request,
     Response
 )
-
-from dungeonbot.oauth import token_negotiation
-from dungeonbot.handlers import EventHandler
-
 import os
-
-from auxiliaries.helpers import eprint
 
 
 ################################
@@ -33,10 +27,9 @@ app.config.update(
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
 )
 
-
-# @app.teardown_appcontext
-# def shutdown_session(exception=None):
-#     DBSession.remove()
+from dungeonbot.oauth import token_negotiation
+from dungeonbot.handlers import EventHandler
+from auxiliaries.helpers import eprint
 
 
 ################################

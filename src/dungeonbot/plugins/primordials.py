@@ -15,7 +15,7 @@ class BangCommandPlugin(BasePlugin):
         self.arg_string = arg_string
 
 
-class HybridCommandPlugin(BasePlugin):
+class SuffixCommandPlugin(BasePlugin):
     def __init__(self, event, arg_string, suffix=None):
         self.event = event
         self.arg_string = arg_string
