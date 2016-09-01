@@ -68,7 +68,7 @@ class SlackHandler(object):
     def get_user_from_id(self, user_id):
         if os.getenv("PERMISSION_TO_SPEAK"):
             user_obj = self.get_user_obj_from_id(user_id)
-            return user_obj['name']
+            return user_obj['name'] if user_obj else None
         else:
             return "A_SLACK_USERNAME"
 
