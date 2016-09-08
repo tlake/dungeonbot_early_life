@@ -1,10 +1,12 @@
 from dungeonbot.plugins.primordials import BangCommandPlugin
 from dungeonbot.handlers.slack import SlackHandler
 
-import random
+from dungeonbot.plugins.die_roll import DieRoll
 
 
 class RollPlugin(BangCommandPlugin):
+    """Plugin for roll."""
+
     help_text = """```
 command:
     !roll
@@ -36,6 +38,7 @@ examples:
 ```"""
 
     def run(self):
+        """Run roll plugin."""
         bot = SlackHandler()
 
         args = self.arg_string.replace(" ", "").split(',')
@@ -51,74 +54,7 @@ examples:
         bot.make_post(self.event, message)
 
     def process_roll(self, roll_str):
-        # import random
-
-        def roll_die(number, sides):
-            result = 0
-            for x in range(0, number):
-                result += random.randint(1, sides)
-            return result
-
-        def advantage(number, sides):
-            die_roll = max(roll_die(number, sides), roll_die(number, sides))
-            message = "with advantage"
-            return (die_roll, message)
-
-        def disadvantage(number, sides):
-            die_roll = min(roll_die(number, sides), roll_die(number, sides))
-            message = "with disadvantage"
-            return (die_roll, message)
-
-        valid_flags = {"a": advantage, "d": disadvantage}
-        roll = ""
-        operator = "+"
-        modifier = 0
-        flag = None
-        message = ""
-
-        if roll_str[0] == "-":
-            roll_str = roll_str[1:]
-
-        if roll_str[0] in valid_flags:
-            flag = roll_str[0]
-            roll_str = roll_str[1:]
-
-        if "+" in roll_str:
-            roll, modifier = roll_str.split("+")
-        elif "-" in roll_str:
-            operator = "-"
-            roll, modifier = roll_str.split("-")
-        else:
-            roll = roll_str
-
-        number, sides = roll.split("d")
-        modifier = int(modifier)
-        number = int(number)
-        sides = int(sides)
-        min_roll = number
-        max_roll = sides * number
-
-        if flag:
-            roll_result, message = valid_flags[flag](number, sides)
-        else:
-            roll_result = roll_die(number, sides)
-
-        roll_plus_mods = "{} {} {}".format(
-                str(roll_result),
-                operator,
-                str(modifier)
-        )
-
-        mod_result = modifier if operator == "+" else modifier * -1
-        result = roll_result + mod_result
-
-        final_result = "*[ {} ]* _({} = {}) (min {}, max {})_ {}".format(
-                result,
-                roll_str,
-                roll_plus_mods,
-                min_roll + mod_result,
-                max_roll + mod_result,
-                message
-            )
-
-        return final_result
+        """Process Roll string."""
+        r = DieRoll(roll_str)
+        result = r.action()
+        return r.print_results(result)
