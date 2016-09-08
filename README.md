@@ -43,13 +43,15 @@ Please be sure to update any relevant help text, and try to be PEP8 compliant.
 ### Developer Project Overview
 
 The innermost `dungeonbot/` directory is the robot proper; it contains all of
-DungeonBot's brains and guts. `dungeonbot/` is configured to be a module, and
-as such, the configuration and routing of the Flask app is contained within
-`dungeonbot/__init__.py`. From there, the logic chain proceeds through
-`dungeonbot/handlers.py`, which parses the Slack input and spins up the
-appropriate plugin in `dungeonbot/plugins.py`. Additionally, database models
-live in `dungeonbot/models.py`, and `dungeonbot/oauth.py` exists to allow
-teams to integrate DungeonBot.
+DungeonBot's brains and guts. The app object itself is created in
+`dungeonbot/app_config.py` and the API routes are defined within
+`dungeonbot/routes.py`. `dungeonbot/` is configured to be a module, and so
+the app config and the routing are both imported into `dungeonbot/__init__.py`.
+From there, the logic chain proceeds through `dungeonbot/handlers/*.py`, which
+parses the Slack input and spins up the appropriate plugin in
+`dungeonbot/plugins/*.py`. Additionally, database models live in
+`dungeonbot/models.py`, and `dungeonbot/oauth.py` exists to allow teams to
+integrate DungeonBot.
 
 Outside of the `dungeonbot` module, `manage.py` will likely be the primary
 interface for interacting with the bot while developing, and `auxiliaries/`
@@ -110,20 +112,30 @@ JSON blob can be pasted into Postman's Body (select the *raw* radio button
 and choose the JSON option form the dropdown) once you strip off the two
 enclosing single quotes. Point Postman to `localhost:5006`.
 
+Access to a Python interpreter with some already-provided imports can be
+achieved with `manage.py shell`. See the contents of `manage.py` to get an
+idea of what that environment looks like.
+
 
 #### Plugin Quickstart
 
-Plugin logic lives inside classes defined in `plugins.py`; these classes
-inherit from the `Plugin()` parent class, which gives them access to 
-the `event` dict and `arg_string`, as well as a default 'help' response.
-Make sure to define `help_text` at the top of the plugin and a `run()`
-method that contains your plugin logic,
+##### Make The Plugin Itself
 
-Need your plugin to post to Slack? Just `import handlers`, instantiate the
+Plugin logic lives inside classes defined in `plugins/*.py`; these classes
+inherit from parent classes defined in `plugins/primordials.py`, which gives
+them access to things like the `event` dict and `arg_string`, as well as a
+default 'help' response. Make sure to define `help_text` at the top of the
+plugin and a `run()` method that contains your plugin logic.
+
+Need your plugin to post to Slack? Just use
+`from dungeonbot.handlers.slack import SlackHandler`, instantiate the
 `SlackHandler()`, and call that handler's `make_post()` method with the
 `event` dict and the message to be posted.
 
 ```
+from dungeonbot.handlers.slack import SlackHandler
+
+
 class YourNewPlugin(Plugin):
     help_text = "DEFINE HELP TEXT HERE"
 
@@ -131,26 +143,50 @@ class YourNewPlugin(Plugin):
         # PLUGIN LOGIC GOES HERE
         
         message = "I need this to go to Slack."
-        import handlers
         bot = SlackHandler()
-        bot.make_post(event, message)
+        bot.make_post(self.event, message)
 ```
 
-Make sure that `HelpPlugin()` is the last class in the file.
+##### Add Plugin To The Event Handler
 
-You must also update the `EventHandler()` class's `valid_commands` in
-`handlers.py` in order for your new plugin to work:
+Update the `EventHandler()` class's `valid_commands` (or `valid_suffixes`, if
+you're making a suffix-command plugin) in `dungeonbot/handlers/event.py`:
 
 ```
-valid_commands = {
+from dungeonbot.plugins import (
     # . . .
-    'name_of_command': plugins.YourNewPlugin,
-    }
+    your_new_plugin_module
+)
+
+class EventHandler(object):
+    # . . .
+    def parse_bang_command(self):
+        valid_commands = {
+            # . . .
+            'name_of_command': your_new_plugin_module.YourNewPlugin,
+        }
+    # . . .
 ```
 
-It would also be helpful to add an entry to `HelpPlugin()`'s `help_text` so
-that people will know that your plugin exists when they run `!help`.
+##### Add Plugin To The Help Plugin
 
+Update the `HelpPlugin()` found in `dungeonbot/plugins/help/` with information
+about your plugin: both its commands, and its help text:
+
+```
+from dungeonbot.plugins.your_new_plugin_module import YourNewPlugin
+
+class HelpPlugin(BangCommandPlugin):
+    help_topics = {
+        # . . .
+        'your_plugin_command': YourNewPlugin,
+    }
+
+    help_text = """```
+available help topics:
+    # . . .
+    your_plugin_command
+```
 
 #### Model Quickstart
 
@@ -159,17 +195,16 @@ class ExampleModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String(128))
 
-    def __init__(self, text):
-        self.text = text
-
     @classmethod
-    def write(cls, text=None):
+    def new(cls, text=None, session=None):
+        if session is None:
+            session = db.session
         instance = cls(text=text)
-        db.session.add(instance)
-        db.session.commit()
+        session.add(instance)
+        session.commit()
         return instance
 ```
 
-_Using class methods on a model (like `write()` above) allows for database
+_Using class methods on a model (like `new()` above) allows for database
 actions to be wrapped up and contained within the model itself in a very nice,
 object-oriented manner._
