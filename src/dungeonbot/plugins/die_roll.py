@@ -7,10 +7,9 @@ class DieRoll(object):
         self.operator = "+"
         # make into a property?
         self.action = self.roll_die
-        # import pdb; pdb.set_trace()
 
         self.modifier = 0
-        self.message = None
+        self.message = ""
         valid_operators = ["+", "-"]
         valid_flags = {
             "a": self.advantage,
@@ -26,7 +25,7 @@ class DieRoll(object):
             if o in roll:
                 self.operator = o
                 roll, mod = roll.split(o)
-                self.modifier = int(mod)
+                self.modifier = int(mod) * -1 if o == "-" else int(mod)
 
         self.number, self.sides = map(int, roll.split("d"))
         self.min_roll = self.number
@@ -35,20 +34,17 @@ class DieRoll(object):
     def print_results(self, roll_result):
         """Return result of roll."""
         roll_plus_mods = "{} {} {}".format(
-            str(roll_result),
+            roll_result,
             self.operator,
-            str(self.modifier)
+            abs(self.modifier)
         )
-        # make into a property and put on object
-        mod_result = self.modifier if self.operator == "+" else self.modifier * -1
 
-        result = roll_result + mod_result
         final_result = "*[ {} ]* _({} = {}) (min {}, max {})_ {}".format(
-            result,
+            roll_result + self.modifier,
             self.roll_str,
             roll_plus_mods,
-            self.min_roll + mod_result,
-            self.max_roll + mod_result,
+            self.min_roll + self.modifier,
+            self.max_roll + self.modifier,
             self.message
         )
 
