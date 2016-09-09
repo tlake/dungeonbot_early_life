@@ -3,7 +3,7 @@ from dungeonbot.plugins.primordials import (
     SuffixCommandPlugin,
 )
 from dungeonbot.handlers.slack import SlackHandler
-from dungeonbot.models import KarmaModel
+from dungeonbot.models.karma import KarmaModel
 
 
 class KarmaAssistant(object):
