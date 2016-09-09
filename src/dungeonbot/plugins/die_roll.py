@@ -19,7 +19,7 @@ class DieRoll(object):
         for f in valid_flags:
             if roll.startswith(f):
                 self.action = valid_flags[f]
-                roll = roll[len(f):]
+                self.roll_str = roll = roll[len(f):]
 
         for o in valid_operators:
             if o in roll:
@@ -39,7 +39,7 @@ class DieRoll(object):
             abs(self.modifier)
         )
 
-        final_result = "*[ {} ]* _({} = {}) (min {}, max {})_ {}".format(
+        final_result = "*[ {} ]* _({} = {}) (min {}, max {}) {}_".format(
             roll_result + self.modifier,
             self.roll_str,
             roll_plus_mods,
