@@ -1,6 +1,8 @@
 # from flask_sqlalchemy import SQLAlchemy
 # from dungeonbot import app
-from dungeonbot.models.karma import db
+# from dungeonbot.models.karma import db
+
+from dungeonbot.models import db
 
 
 class RollModel(db.model):
