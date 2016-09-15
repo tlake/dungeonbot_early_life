@@ -20,6 +20,7 @@ class RollModel(db.Model):
 
     @classmethod
     def parse_key_val_pairs(cls, roll_str):
+        """Parse Key/Val Pairs from a string, where val begins with an Integer."""
         import re
         m = re.search("\d", roll_str)
         if m:
@@ -29,7 +30,7 @@ class RollModel(db.Model):
             return key, value
 
     @classmethod
-    def new(cls, key="", val="", session=None):
+    def new(cls, key="", val="", user=None, session=None):
         """Create New saved roll from a key value pair."""
         if session is None:
             session = db.session
