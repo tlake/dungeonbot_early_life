@@ -2,6 +2,7 @@ from dungeonbot.plugins.primordials import BangCommandPlugin
 from dungeonbot.handlers.slack import SlackHandler
 
 from dungeonbot.plugins.die_roll import DieRoll
+from dungeonbot.models.roll import RollModel
 
 
 class RollPlugin(BangCommandPlugin):
@@ -42,6 +43,7 @@ examples:
         bot = SlackHandler()
 
         args = self.arg_string.replace(" ", "").split(',')
+        # user = bot.get_user_from_id(self.event['user'])
 
         message = "_*Roll result{} for {}:*_".format(
             "s" if len(args) > 1 else "",
@@ -55,6 +57,38 @@ examples:
 
     def process_roll(self, roll_str):
         """Process Roll string."""
+        import re
+        # Save new Roll
+        bot = SlackHandler()
+        user = bot.get_user_from_id(self.event['user'])
+
+        if roll_str.startswith("save"):
+            parsed = RollModel.parse_key_val_pairs(roll_str.lstrip("save"))
+            if parsed:
+                return RollModel.new(parsed[0], parsed[1], user)
+            else:
+
+
+        # list all saved rolls
+        if roll_str == "list":
+            roll_str = roll_str.lstrip("list")
+            # if roll_str:
+            #     try:
+            #         how_many = int(roll_str)
+            #     except ValueError:
+            #         how_many = 10
+            query_user = user
+            how_many = 10
+            # if roll_str:
+                # query_user, how_many = regex stuff on roll_str
+            return RollModel.list(how_many=how_many, user=query_user)
+
+        # Check for saved roll.
+        saved_roll = RollModel.get_by_key(roll_str, user)
+        if saved_roll:
+            # if roll is saved, assign the saved rolls value to roll_str
+            roll_str = saved_roll.value
+
+        # Create new roll object, and print result of obj's action.
         r = DieRoll(roll_str)
-        result = r.action()
-        return r.print_results(result)
+        return r.print_results(r.action())
