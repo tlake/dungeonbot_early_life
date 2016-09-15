@@ -39,7 +39,7 @@ class RollModel(db.Model):
         return instance
 
     @classmethod
-    def get_by_key(cls, key=None, session=None):
+    def get_by_key(cls, key=None, user=None, session=None):
         """Query Database by name (Key)."""
         if session is None:
             session = db.session

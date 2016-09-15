@@ -77,7 +77,7 @@ examples:
             return RollModel.list(how_many=how_many, user=user)
 
         # Check for saved roll.
-        saved_roll = RollModel.get_by_key(roll_str, user)
+        saved_roll = RollModel.get_by_key(key=roll_str, user=user)
         if saved_roll:
             # if roll is saved, assign the saved rolls value to roll_str
             roll_str = saved_roll.value
