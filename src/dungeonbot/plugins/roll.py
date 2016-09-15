@@ -57,7 +57,6 @@ examples:
 
     def process_roll(self, roll_str):
         """Process Roll string."""
-        import re
         # Save new Roll
         bot = SlackHandler()
         user = bot.get_user_from_id(self.event['user'])
@@ -67,21 +66,15 @@ examples:
             if parsed:
                 return RollModel.new(parsed[0], parsed[1], user)
             else:
-
+                return "Not a valid Key/Value Pair"
 
         # list all saved rolls
         if roll_str == "list":
-            roll_str = roll_str.lstrip("list")
-            # if roll_str:
-            #     try:
-            #         how_many = int(roll_str)
-            #     except ValueError:
-            #         how_many = 10
-            query_user = user
             how_many = 10
-            # if roll_str:
-                # query_user, how_many = regex stuff on roll_str
-            return RollModel.list(how_many=how_many, user=query_user)
+            roll_str = roll_str.lstrip("list")
+            if roll_str:
+                how_many = int(roll_str)
+            return RollModel.list(how_many=how_many, user=user)
 
         # Check for saved roll.
         saved_roll = RollModel.get_by_key(roll_str, user)
