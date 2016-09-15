@@ -5,7 +5,7 @@ from sqlalchemy.orm.exc import NoResultFound
 db = SQLAlchemy(app)
 
 
-class RollModel(db.model):
+class RollModel(db.Model):
     """Model for saved rolls.
 
     Saved rolls will have a string id key, identifying name of roll.
@@ -69,7 +69,7 @@ class RollModel(db.model):
     @property
     def repr(self):
         """Repr."""
-            return(
-                """
-                <dungeonbot.models.RollModel(id={},key={}, value={}, user={})>
-                """.format(self.id, self.key, self.value, self.user)
+        return(
+            """
+            <dungeonbot.models.RollModel(id={},key={}, value={}, user={})>
+            """.format(self.id, self.key, self.value, self.user))
